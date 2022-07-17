@@ -20,27 +20,20 @@ async function main() {
         process.env.PRIVATE_KEY_PASSWORD
     );
     wallet = await wallet.connect(provider);
-    const abi = fs.readFileSync(
-        "./SimpleStorage_sol_SimpleStorage.abi",
-        "utf8"
-    );
-    const binary = fs.readFileSync(
-        "./SimpleStorage_sol_SimpleStorage.bin",
-        "utf8"
-    );
+    const abi = fs.readFileSync("./PragmaBank_sol_PragmaBank.abi", "utf8");
+    const binary = fs.readFileSync("./PragmaBank_sol_PragmaBank.bin", "utf8");
     const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
     console.log("Deploying, please wait...");
     const contract = await contractFactory.deploy();
     await contract.deployTransaction.wait(1);
-    console.log(`Contract address: ${contract.address}`);
-    const currentFavoriteNumber = await contract.retrieve();
-    console.log(`Current favorite number: ${currentFavoriteNumber.toString()}`);
-    const transactionResponse = await contract.store("7");
-    const transactionReceipt = await transactionResponse.wait(1);
-    const currentFavoriteNumberUpdated = await contract.retrieve();
-    console.log(
-        `Updated favorite number: ${currentFavoriteNumberUpdated.toString()}`
+    const transactionResponse = await contract.addPerson(
+        "Albert",
+        12,
+        "albert@anonimo.com"
     );
+    const transactionReceipt = await transactionResponse.wait(1);
+    const currentFavoriteNumberUpdated = await contract.getListOfAccounts();
+    console.log(`Lista de cuentas: ${currentFavoriteNumberUpdated.toString()}`);
     // podemos esperar un bloque más para asegurarnos que la cadena más larga sea quien lo implemente
     // const transactionReceipt = await contract.deployTransaction.wait(1);
     // console.log("Let's deploy with only transaction data!");
